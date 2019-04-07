@@ -4,17 +4,17 @@
 #include <ESP8266HTTPClient.h>
 #include <ESP8266WiFi.h>
 
-#define TX_PIN 6 // Arduino transmit  YELLOW WIRE  labeled RX on printer
-#define RX_PIN 5 // Arduino receive   GREEN WIRE   labeled TX on printer
+#define TX_PIN D6 // Arduino transmit  YELLOW WIRE  labeled RX on printer
+#define RX_PIN D5 // Arduino receive   GREEN WIRE   labeled TX on printer
 
-SoftwareSerial mySerial(RX_PIN, TX_PIN); // Declare SoftwareSerial obj first
-Adafruit_Thermal printer(&mySerial);     // Pass addr to printer constructor
+SoftwareSerial mySerial(RX_PIN, TX_PIN);
+Adafruit_Thermal printer(&mySerial);
 WiFiClient client;
 HTTPClient http;
 
 void setup() {
-  mySerial.begin(19200);  // Initialize SoftwareSerial
-  printer.begin();        // Init printer (same regardless of serial type)
+  mySerial.begin(19200);
+  printer.begin();
 
   Serial.begin(9600);
 
@@ -38,10 +38,12 @@ void loop() {
   http.end();
   Serial.println(res);
   Serial.println(payload);
-  // printer.println("@benwafflez: tweet");
-  // printer.feed(2);
-  // printer.sleep();      // Tell printer to sleep
-  delay(3000L);         // Sleep for 3 seconds
-  // printer.wake();       // MUST wake() before printing again, even if reset
-  // printer.setDefault(); // Restore printer to defaults
+  if (res == 200) {
+    printer.wake();
+    printer.setDefault();
+    printer.println(payload);
+    printer.feed(2);
+    printer.sleep();
+  }
+  delay(1000L);
 }
