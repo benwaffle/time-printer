@@ -18,6 +18,10 @@ const stream = client.stream('statuses/filter', { track: 'right now', language: 
 
 let latestTweet = null;
 
+function stripUnicode(str) {
+    return Array.from(str).filter(x => x.charCodeAt() < 128).join('').trim()
+}
+
 stream.on('data', (ev) => {
     if (!ev) {
         // throw new Error('wtf')
@@ -26,7 +30,7 @@ stream.on('data', (ev) => {
     if (!ev.text || ev.retweeted_status || ev.truncated || !ev.text.match(/right now/i))
         return
 
-    latestTweet = `@${ev.user.screen_name}: ${ev.text.replace('\n', ' ')}`
+    latestTweet = stripUnicode(`@${ev.user.screen_name}: ${ev.text.replace('\n', ' ')}`)
 })
 
 stream.on('error', (err) => { throw err })
