@@ -38,6 +38,6 @@ router.get('/', (ctx) => {
 app
   .use(router.routes())
   .use(router.allowedMethods())
- .listen(3000)
+  .listen(3000)
 
 console.log('http://localhost:3000')
