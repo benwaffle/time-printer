@@ -1,8 +1,11 @@
-const koa = require('koa')
+const Koa = require('koa')
+const Router = require('koa-router')
+
+const app = new Koa()
+const router = new Router()
+
 const Twitter = require('twitter')
 require('dotenv').config()
-
-const intervalSeconds = 3
 
 const client = new Twitter({
     consumer_key: process.env.CONSUMER_KEY,
@@ -13,18 +16,28 @@ const client = new Twitter({
 
 const stream = client.stream('statuses/filter', { track: 'right now', language: 'en' })
 
-let lastPrint = new Date()
+let latestTweet = null;
 
 stream.on('data', (ev) => {
     if (!ev) {
-        throw new Error('wtf')
-    }
-    if (!ev.text || ev.retweeted_status || !ev.text.match(/right now/i))
+        // throw new Error('wtf')
         return
-    if (new Date() - lastPrint > intervalSeconds*1000) {
-        console.log(`@${ev.user.screen_name}: ${ev.text.replace('\n', ' ')}`)
-        lastPrint = new Date()
     }
+    if (!ev.text || ev.retweeted_status || ev.truncated || !ev.text.match(/right now/i))
+        return
+
+    latestTweet = `@${ev.user.screen_name}: ${ev.text.replace('\n', ' ')}`
 })
 
 stream.on('error', (err) => { throw err })
+
+router.get('/', (ctx) => {
+    ctx.body = latestTweet
+})
+
+app
+  .use(router.routes())
+  .use(router.allowedMethods())
+ .listen(3000)
+
+console.log('http://localhost:3000')
