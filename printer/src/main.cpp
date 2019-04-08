@@ -2,7 +2,6 @@
 #include <SoftwareSerial.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
-#include <ESP8266WiFi.h>
 
 #define TX_PIN D6 // Arduino transmit  YELLOW WIRE  labeled RX on printer
 #define RX_PIN D5 // Arduino receive   GREEN WIRE   labeled TX on printer
@@ -16,9 +15,11 @@ void setup() {
   mySerial.begin(19200);
   printer.begin();
 
-  Serial.begin(9600);
+  Serial.begin(115200);
 
-  WiFi.begin("toasters don't toast toast", "toast toast toast");
+  Serial.println(WiFi.macAddress());
+
+  WiFi.begin("Stevens-Media", "Stevens1870");
 
   Serial.print("Connecting");
   while (WiFi.status() != WL_CONNECTED) {
@@ -45,5 +46,5 @@ void loop() {
     printer.feed(2);
     printer.sleep();
   }
-  delay(1000L);
+  delay(5000L);
 }
