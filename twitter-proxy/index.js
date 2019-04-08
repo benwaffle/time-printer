@@ -27,7 +27,7 @@ stream.on('data', (ev) => {
         // throw new Error('wtf')
         return
     }
-    if (!ev.text || ev.retweeted_status || ev.truncated || !ev.text.match(/right now/i))
+    if (!ev.text || ev.retweeted_status || ev.truncated || !ev.text.match(/right now/i) || ev.text.match(/[wc]ould/i))
         return
 
     latestTweet = stripUnicode(`@${ev.user.screen_name}: ${ev.text.replace('\n', ' ')}`)
