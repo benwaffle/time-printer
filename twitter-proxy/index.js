@@ -14,12 +14,16 @@ const client = new Twitter({
     access_token_secret: process.env.ACCESS_TOKEN_SECRET,
 })
 
-const stream = client.stream('statuses/filter', { track: 'right now', language: 'en' })
+const stream = client.stream('statuses/filter', { track: 'trump', language: 'en' })
 
 let latestTweet = null;
 
 function stripUnicode(str) {
-    return Array.from(str).filter(x => x.charCodeAt() < 128).join('').trim()
+    return Array.from(str).filter(x => x.charCodeAt() < 128).join('')
+}
+
+function stripUrls(str) {
+    return str.replace(/https?:\/\/[A-Za-z0-9\.-\/]+/ig, '')
 }
 
 stream.on('data', (ev) => {
@@ -27,10 +31,10 @@ stream.on('data', (ev) => {
         // throw new Error('wtf')
         return
     }
-    if (!ev.text || ev.retweeted_status || ev.truncated || !ev.text.match(/right now/i) || ev.text.match(/[wc]ould/i))
+    if (!ev.text || ev.retweeted_status || ev.truncated) // || !ev.text.match(/right now/i) || ev.text.match(/[wc]ould/i))
         return
 
-    latestTweet = stripUnicode(`@${ev.user.screen_name}: ${ev.text.replace('\n', ' ')}`)
+    latestTweet = stripUrls(stripUnicode(`@${ev.user.screen_name}: ${ev.text.replace(/\n/g, ' ')}`)).trim()
 })
 
 stream.on('error', (err) => { throw err })
